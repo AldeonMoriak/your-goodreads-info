@@ -133,6 +133,7 @@ export interface Database {
           date_read: string | null
           id: string
           private_notes: string | null
+          rating: number | null
           read_count: number | null
           review: string | null
           spoiler: string | null
@@ -144,6 +145,7 @@ export interface Database {
           date_read?: string | null
           id?: string
           private_notes?: string | null
+          rating?: number | null
           read_count?: number | null
           review?: string | null
           spoiler?: string | null
@@ -155,6 +157,7 @@ export interface Database {
           date_read?: string | null
           id?: string
           private_notes?: string | null
+          rating?: number | null
           read_count?: number | null
           review?: string | null
           spoiler?: string | null
