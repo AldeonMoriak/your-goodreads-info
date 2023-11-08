@@ -16,12 +16,8 @@ export default async function Home() {
           <h1 className="text-3xl font-semibold mb-4">Welcome to Your Goodreads Info App</h1>
           <p className="text-gray-600 mb-6">
             Explore our{' '}
-            <span className="underline underline-offset-2 decoration-orange-500 text-gray-400 text-lg">
+            <span className="underline underline-offset-2 decoration-orange-500 text-orange-400 text-lg">
               features
-            </span>{' '}
-            and{' '}
-            <span className="underline underline-offset-2 decoration-orange-500 text-gray-400 text-lg">
-              examples
             </span>{' '}
             below:
           </p>
@@ -34,19 +30,12 @@ export default async function Home() {
             </Link>
           ) : (
             <Link
-              href="/dashboard"
+              href="/overview"
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300"
             >
-              Dashboard
+              Overview
             </Link>
 			 )}
-          <p className="mt-4">
-            {`Here's`} an{' '}
-            <Link href="/example" className="text-orange-300 text-lg underline decoration-white">
-              example
-            </Link>{' '}
-            page.
-          </p>
         </div>
       </div>
     </main>

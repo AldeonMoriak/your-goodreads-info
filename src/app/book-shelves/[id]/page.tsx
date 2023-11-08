@@ -2,6 +2,8 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import BookCard from '@/app/components/BookCard';
 
 export default async function Bookshelf({ params }: { params: { id: string } }) {
   const supabase = createServerComponentClient<Database>({
@@ -13,7 +15,7 @@ export default async function Bookshelf({ params }: { params: { id: string } }) 
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect('/');
+    redirect('/login');
   }
 
   const { data: bookshelf, error } = await supabase
@@ -22,34 +24,29 @@ export default async function Bookshelf({ params }: { params: { id: string } }) 
     .eq('id', params.id)
     .single();
 
-  if (error) return error.message;
+  if (error) return redirect('/book-shelves');
   const { data: books, error: bookError } = await supabase
     .from('books')
-    .select(`*, book_shelf(count)`)
+    .select(`*, book_shelf!inner(bookshelf)`)
     .eq('book_shelf.bookshelf', params.id);
-
-  console.log(bookError);
 
   return (
     <div className="p-5">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 leading-6 bg-stripes-fuchsia rounded-lg">
-        {bookshelf ? (
-          <>
-            <div className="border border-white rounded p-2 bg-purple-500">
-              <div>{bookshelf.title}</div>
-              <div>{books ? JSON.stringify(books[0], null, 2) : null}</div>
-            </div>
+      {bookshelf ? (
+        <>
+          <section className=" p-4">
+            <div className="text-2xl font-bold mb-2">Shelf: {bookshelf.title}</div>
+            {books ? <div className="text-lg">{books.length} books</div> : null}
+          </section>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 leading-6 bg-stripes-fuchsia rounded-lg">
             {books?.map((book) => (
-              <div key={book.id}>
-                <div>{book.title}</div>
-                <div>{book.page_number} pages</div>
-                <div>{book.average_rating} stars. </div>
-                <div>originally published on {book.original_publication_year}</div>
-              </div>
+              <Link href={'/books/' + book.id} key={book.id} className='w-full'>
+                <BookCard book={book} />
+              </Link>
             ))}
-          </>
-        ) : null}
-      </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }

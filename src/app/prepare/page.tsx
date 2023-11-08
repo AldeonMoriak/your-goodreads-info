@@ -14,7 +14,7 @@ export default async function Prepare() {
   } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect('/');
+    redirect('/login');
   }
   const { data: userData } = await supabase.auth.getUser();
 

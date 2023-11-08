@@ -8,15 +8,26 @@ import type { Session } from '@supabase/auth-helpers-nextjs';
 import { Database } from '@/lib/database.types';
 
 export default function LoginForm({ session }: { session: Session | null }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSignIn, setIsSignIn] = useState(true);
   const router = useRouter();
   const supabase = createClientComponentClient<Database>();
 
-  const handleSignUp = async () => {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm((prev) => {
+      return {
+        ...prev,
+        [e.target.name]: e.target.value,
+      };
+    });
+  }
+
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     await supabase.auth.signUp({
-      email,
-      password,
+      email: form.email,
+      password: form.password,
       options: {
         emailRedirectTo: `${location.origin}/auth/callback`,
       },
@@ -24,14 +35,15 @@ export default function LoginForm({ session }: { session: Session | null }) {
     router.refresh();
   };
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: form.email,
+      password: form.password,
     });
 
-	 console.log(error, data);
-	 if(!error) router.push('/')
+    if (error) setErrorMessage(error.message);
+    if (!error) router.push('/');
     router.refresh();
   };
 
@@ -48,9 +60,13 @@ export default function LoginForm({ session }: { session: Session | null }) {
     </div>
   ) : (
     <div className="flex h-screen justify-center items-center">
-      <form className="w-full max-w-md shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <form
+        className="w-full max-w-md shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        onSubmit={isSignIn ? handleSignIn : handleSignUp}
+      >
+      <p className='text-red-400 text-sm'>{errorMessage}</p>
         <div className="mb-4">
-          <label className="block text-gray-100 text-sm font-bold mb-2" htmlFor="username">
+          <label className="block text-gray-600 text-sm font-bold mb-2" htmlFor="username">
             Username
           </label>
           <input
@@ -58,43 +74,43 @@ export default function LoginForm({ session }: { session: Session | null }) {
             id="email"
             required
             name="email"
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
-            type="text"
+            onChange={handleInputChange}
+            value={form.email}
+            type="email"
             placeholder="Email"
           />
         </div>
         <div className="mb-6">
-          <label className="block text-gray-100 text-sm font-bold mb-2" htmlFor="password">
+          <label className="block text-gray-600 text-sm font-bold mb-2" htmlFor="password">
             Password
           </label>
           <input
             className="shadow appearance-none border border-red rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             name="password"
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
+            onChange={handleInputChange}
             required
+            value={form.password}
             id="password"
             type="password"
             placeholder="******************"
           />
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={handleSignUp}
+            className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="submit"
           >
-            Sign up
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={handleSignIn}
-          >
-            Sign in
+            {isSignIn ? 'Sign In' : 'Sign up'}
           </button>
         </div>
+        <button
+          className="mt-5 text-gray-400 text-sm underline hover:text-gray-800"
+          type="button"
+          onClick={() => setIsSignIn((prev) => !prev)}
+        >
+          {' '}
+          Wanna {isSignIn ? 'Sign Up' : 'Sign In'}?
+        </button>
       </form>
     </div>
   );
