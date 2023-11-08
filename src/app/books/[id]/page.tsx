@@ -47,7 +47,7 @@ export default async function Book({ params }: { params: { id: string } }) {
                         </p>
                         <p className="text-sm text-center mb-2">
                           Read {book.user_book[0].read_count}{' '}
-                          {book.user_book[0].read_count ?? 0 > 1 ? 'times' : 'time'}
+                          {(book.user_book[0].read_count ?? 0) > 1 ? 'times' : 'time'}
                         </p>
                       </>
                     ) : null}
@@ -82,7 +82,9 @@ export default async function Book({ params }: { params: { id: string } }) {
                   </Link>
                 ))}
               </div>
-              <p className="text-base max-w-2xl indent-8 whitespace-normal mt-10 break-words">{book.user_book[0].review}</p>
+              <p className="text-base max-w-2xl indent-8 whitespace-normal mt-10 break-words">
+                {book.user_book[0].review}
+              </p>
             </div>
           </div>
         </div>
